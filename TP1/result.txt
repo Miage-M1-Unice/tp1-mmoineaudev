@@ -1,0 +1,397 @@
+LU: 
+package MIAGE_M1.IO;
+
+import java.io.File;
+import java.io.PrintStream;
+import java.util.Scanner;
+
+public class Secrit extends SeLit{
+    @Override
+    String lecture(Scanner source) {
+        String content = super.lecture(source);
+        try{
+            System.setOut(new PrintStream(new File("./result.txt")));
+        }catch(Exception e){
+            e.printStackTrace();
+        }
+        System.out.println(content);
+        return content;
+    }
+}
+
+ *** LU: 
+package MIAGE_M1.IO;
+
+import java.io.File;
+import java.io.PrintStream;
+import java.util.Scanner;
+
+public class Secrit extends SeLit{
+    @Override
+    String lecture(Scanner source) {
+        String content = super.lecture(source);
+        try{
+            System.setOut(new PrintStream(new File("./result.txt")));
+        }catch(Exception e){
+            e.printStackTrace();
+        }
+        System.out.println(content);
+        return content;
+    }
+}
+
+ *** LU: 
+package MIAGE_M1.view;
+
+import java.util.List;
+
+public class Console {
+    public Console() {
+    }
+
+    public static void print(List<String> data){
+        for(String s : data) System.out.println(" *** "+s);
+    }
+    public static void print(String... data){
+        for(String s : data) System.out.println(" *** "+s);
+    }
+    public static void debug(Object from, String s){
+        print("DEBUG from "+from.getClass().getSimpleName(), s );
+    }
+}
+
+**********
+LU: 
+package MIAGE_M1.IO;
+
+import MIAGE_M1.filesystem.FileLister;
+
+import java.io.*;
+import java.util.ArrayList;
+import java.util.Scanner;
+import java.util.regex.Pattern;
+
+public class IOExercise2 {
+    public static String readSeLit() throws FileNotFoundException {
+        SeLit luiMeme = new SeLit();
+        String pathToSeLit = "./src/main/java/"+SeLit.class.getName().replace(".","/")+".java";
+        FileReader fileReader = new FileReader(new File(pathToSeLit));
+        Scanner scanner = new Scanner(fileReader);
+        return luiMeme.lecture(scanner);
+    }
+
+    public static String readEveryThing() throws IOException, FileNotFoundException {
+        SeLit etLesAutresAussi = new SeLit();
+        ArrayList<String> listing = new ArrayList<>();
+        for(File file : FileLister.getFileListRecursion("..")){
+            if(okNotOk(file.getPath())) listing.add(file.getPath());
+        }
+        FileReader fileReader = null;
+        String res="";
+
+        for (String s : listing) {
+            fileReader = new FileReader(new File(s));
+            Scanner scanner = new Scanner(fileReader);
+            res += etLesAutresAussi.lecture(scanner) + "\n**********\n";
+        }
+
+        return res;
+
+    }
+
+    private static boolean okNotOk(String fileName){
+        Pattern p = Pattern.compile("^.*\\.java$");
+        return p.matcher(fileName).matches();
+    }
+
+    public static String readSecrit() throws FileNotFoundException {
+        Secrit luiMeme = new Secrit();
+        String pathToSecrit = "./src/main/java/"+Secrit.class.getName().replace(".","/")+".java";
+        FileReader fileReader = new FileReader(new File(pathToSecrit));
+        Scanner scanner = new Scanner(fileReader);
+        return luiMeme.lecture(scanner);
+    }
+}
+
+**********
+LU: 
+package MIAGE_M1.IO;
+
+import java.io.File;
+import java.io.PrintStream;
+import java.util.Scanner;
+
+public class Secrit extends SeLit{
+    @Override
+    String lecture(Scanner source) {
+        String content = super.lecture(source);
+        try{
+            System.setOut(new PrintStream(new File("./result.txt")));
+        }catch(Exception e){
+            e.printStackTrace();
+        }
+        System.out.println(content);
+        return content;
+    }
+}
+
+**********
+LU: 
+package MIAGE_M1.IO;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.util.Scanner;
+
+public class SeLit {
+    String lecture(Scanner source) {
+        String res = "LU: \n";
+        while(source.hasNextLine()) {
+            String s = source.nextLine();
+            if(s.trim().startsWith("
+            else if(s.trim().startsWith("*")) continue;
+            else if(s.trim().startsWith("/*")) continue;
+            else if(s.trim().startsWith("*/")) continue;
+            else if(s.contains("
+               s= s.split("
+            }
+
+            res+=s+"\n";
+        }
+        return res;
+    }
+
+}
+
+**********
+LU: 
+package MIAGE_M1.filesystem;
+
+import java.io.File;
+import java.io.FilenameFilter;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.regex.Pattern;
+import java.util.stream.Stream;
+
+public class FileLister implements FilenameFilter {
+    public FileLister(){
+    }
+
+    public File[] ListWithFilter(String path){
+        File root = new File(path);
+        return root.listFiles(this);
+    }
+    @Override
+    public boolean accept(File dir, String s) {
+        Pattern p = Pattern.compile("^.*\\.java$");
+        return p.matcher(s).matches();
+    }
+
+    public File[] ListWithAnonymousInnerFilter(String path){
+        FilenameFilter inner = new FilenameFilter() {
+
+            @Override
+            public boolean accept(File file, String s) {
+                return false;
+            }
+        };
+
+        File root = new File(path);
+        return root.listFiles(inner);
+    }
+
+    public static List<File> getFileListRecursion(String path) throws IOException {
+        return getFileListRecursionF(new File(path));
+    }
+    private static List<File> getFileListRecursionF(File f) throws IOException {
+        List<File> list = new ArrayList<File>();
+        if(f.isDirectory()) {
+            ls(f.getPath()).map(aPath -> aPath.toFile()).forEach(file -> {
+                try {
+                    list.addAll(getFileListRecursionF(file));
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            });
+        }else list.add(f);
+        return list;
+    }
+
+    public static List<String> listFilesInDir(String path) throws IOException {
+        ArrayList<String> list = new ArrayList();
+        ls(path).map(aPath -> aPath.toFile()).forEach(file -> list.add(file.getPath()));
+        return list;
+    }
+    private static Stream<Path> ls(String path) throws IOException {
+        File dir = new File(path);
+        return Files.list(dir.toPath());
+    }
+
+
+    public class InnerFileLister implements FilenameFilter{
+        public InnerFileLister(){
+        }
+        @Override
+        public boolean accept(File dir, String s) {
+            if(s.endsWith(".java"))
+                return true;
+            else return false;
+        }
+        public File[] ListWithFilter(String path){
+            File root = new File(path);
+            return root.listFiles(this);
+        }
+    }
+}
+
+**********
+LU: 
+package MIAGE_M1;
+
+import MIAGE_M1.filesystem.FileLister;
+import org.junit.Test;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+import static MIAGE_M1.view.Console.print;
+import static org.junit.Assert.*;
+public class FileListerTest {
+
+    @Test
+    public void listFilesInDir() {
+        print("QUESTION 1");
+        try {
+            List<String> arbo = FileLister.listFilesInDir(".");
+            assertTrue(arbo.contains("./src"));
+            assertTrue(arbo.contains("./pom.xml"));
+            assertTrue(arbo.contains("./readme.md"));
+            print(arbo);
+        } catch (IOException e) {
+            fail();
+        }
+    }
+
+    @Test
+    public void listFilesInDirRecursive() {
+        print("QUESTION 2");
+        try {
+            List<File> arbo = FileLister.getFileListRecursion(".");
+            for(File file : arbo){
+                print(file.getPath());
+            }
+            assertTrue(arbo.contains(new File("./src/test/java/MIAGE_M1/FileListerTest.java") ));
+            assertTrue(arbo.contains(new File("./src/main/java/MIAGE_M1/filesystem/FileLister.java") ));
+
+        } catch (IOException e) {
+            fail();
+        }
+    }
+
+    @Test
+    public void ListWithFilter() {
+        print("QUESTION 3", "ListWithFilter");
+
+        File[] fileArray = (new FileLister()).ListWithFilter("./src/main/java/MIAGE_M1/filesystem");
+        List<String> list = new ArrayList<>();
+        Arrays.stream(fileArray).forEach(l->list.add(l.getPath()));
+
+        fileArray = (new FileLister()).ListWithFilter("./target/classes/MIAGE_M1/view");
+        Arrays.stream(fileArray).forEach(l->list.add(l.getPath()));
+        print(list);
+
+        for(String s : list) {
+            if(!s.endsWith(".java")) fail();
+            if(s.contains("/target")) fail();
+        }
+    }
+    @Test
+    public void InnerListWithFilter() {
+        print("QUESTION 3", "InnerListWithFilter");
+
+        File[] fileArray = (new FileLister()).new InnerFileLister().ListWithFilter("./src/main/java/MIAGE_M1/filesystem");
+        List<String> list = new ArrayList<>();
+        Arrays.stream(fileArray).forEach(l->list.add(l.getPath()));
+
+        fileArray = (new FileLister()).new InnerFileLister().ListWithFilter("./target/classes/MIAGE_M1/view");
+        Arrays.stream(fileArray).forEach(l->list.add(l.getPath()));
+        print(list);
+
+        for(String s : list) {
+            if(!s.endsWith(".java")) fail();
+            if(s.contains("/target")) fail();
+        }
+    }
+
+    @Test
+    public void ListWithAnonymousInnerFilter() {
+        print("QUESTION 3", "ListWithAnonymousInnerFilter");
+        File[] fileArray = (new FileLister()).ListWithAnonymousInnerFilter("./src/main/java/MIAGE_M1/filesystem");
+        List<String> list = new ArrayList<>();
+        Arrays.stream(fileArray).forEach(l->list.add(l.getPath()));
+
+        fileArray = (new FileLister()).ListWithAnonymousInnerFilter("./target/classes/MIAGE_M1/view");
+        Arrays.stream(fileArray).forEach(l->list.add(l.getPath()));
+        print(list);
+
+        for(String s : list) {
+            if(!s.endsWith(".java")) fail();
+            if(s.contains("/target")) fail();
+        }
+    }
+
+}
+
+**********
+LU: 
+package MIAGE_M1.IO;
+
+import org.junit.Test;
+
+import java.io.FileNotFoundException;
+
+import static MIAGE_M1.view.Console.print;
+import static org.junit.Assert.*;
+
+public class IOExercise2Test {
+
+    @Test
+    public void readSeLit() {
+        try {
+            print(IOExercise2.readSeLit());
+        } catch (Exception e) {
+            fail();
+        }
+    }
+
+
+    @Test
+    public void readSecrit() {
+        try {
+            print(IOExercise2.readSecrit());
+        } catch (Exception e) {
+            fail();
+        }
+    }
+
+
+    @Test
+    public void readEveryThing() {
+        try {
+            print(IOExercise2.readEveryThing());
+        } catch (Exception e) {
+            fail();
+        }
+    }
+
+
+}
+
+**********
+
