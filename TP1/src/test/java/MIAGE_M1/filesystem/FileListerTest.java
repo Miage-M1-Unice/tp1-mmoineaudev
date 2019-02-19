@@ -1,4 +1,4 @@
-package MIAGE_M1;
+package MIAGE_M1.filesystem;
 
 import MIAGE_M1.filesystem.FileLister;
 import org.junit.Test;
