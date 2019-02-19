@@ -1,5 +1,8 @@
 package MIAGE.introspection;
 
+/**
+ * POJO utilité pour tester l'introspection
+ */
 public class ClasseBidon {
     public int un = 1;
     public int deux = 2;

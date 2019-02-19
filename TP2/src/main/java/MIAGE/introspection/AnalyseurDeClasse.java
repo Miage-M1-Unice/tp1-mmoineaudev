@@ -6,12 +6,15 @@ package MIAGE.introspection;
  * Cay S. Horstmann & Gary Cornell, publiée dans le livre Core Java, Sun Press
  */
 
-import com.sun.org.apache.xpath.internal.operations.Mod;
-
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.lang.reflect.*;
-import java.io.*;
-import java.util.Arrays;
-import java.util.List;
+
+
+/**
+ * Implémentation des questions du TP2
+ */
 
 public class AnalyseurDeClasse {
 
@@ -128,9 +131,9 @@ public class AnalyseurDeClasse {
         for (Field f : fields){
             Field[] subfields = f.getType().getFields();
             if(subfields.length==0){
-                    res+=indent + " "+ f.getType().getName() + " "+ f.getName()+" = "+f.get(o);
+                    res+=indent + f.getType().getName() + " "+ f.getName()+" = "+f.get(o)+ ";";
             }else {
-                    res+=indent+" " +f.getName() +" "+ genericToString(lvl + 1,f.get(o));
+                    res+=indent + genericToString(lvl + 1,f.get(o))+ " " +f.getName()+ ";";
             }
 
         }
