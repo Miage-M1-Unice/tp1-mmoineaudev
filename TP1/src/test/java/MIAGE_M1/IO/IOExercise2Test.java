@@ -12,7 +12,7 @@ public class IOExercise2Test {
     @Test
     public void readSeLit() {
         try {
-            print(IOExercise2.readSeLit());
+            print(this, IOExercise2.readSeLit());
         } catch (Exception e) {
             fail();
         }
@@ -22,7 +22,7 @@ public class IOExercise2Test {
     @Test
     public void readSecrit() {
         try {
-            print(IOExercise2.readSecrit());
+            print(this, IOExercise2.readSecrit());
         } catch (Exception e) {
             fail();
         }

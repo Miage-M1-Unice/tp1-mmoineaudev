@@ -15,7 +15,7 @@ public class FileListerTest {
 
     @Test
     public void listFilesInDir() {
-        print("QUESTION 1");
+        print(this, "QUESTION 1");
         try {
             List<String> arbo = FileLister.listFilesInDir(".");//on est a la racine du projet on s'attends a récupérer les fichiers a la racine du projet
             assertTrue(arbo.contains("./src"));
@@ -29,7 +29,7 @@ public class FileListerTest {
 
     @Test
     public void listFilesInDirRecursive() {
-        print("QUESTION 2");
+        print(this, "QUESTION 2");
         try {
             List<File> arbo = FileLister.getFileListRecursion(".");//on est a la racine du projet on s'attends a récupérer les fichiers a la racine du projet
             for(File file : arbo){
@@ -37,7 +37,7 @@ public class FileListerTest {
             }
             //ca veut pas dire grand chose mais ca renvoie bien ce a quoi on s'attend
             //j'ai mis ces fichiers ci car ils ne changeront sans doute pas tant que ce ficher existe
-            assertTrue(arbo.contains(new File("./src/test/java/MIAGE_M1/FileListerTest.java") ));
+            assertTrue(arbo.contains(new File("./src/test/java/MIAGE_M1/filesystem/FileListerTest.java") ));
             assertTrue(arbo.contains(new File("./src/main/java/MIAGE_M1/filesystem/FileLister.java") ));
 
         } catch (IOException e) {
@@ -47,7 +47,7 @@ public class FileListerTest {
 
     @Test
     public void ListWithFilter() {
-        print("QUESTION 3", "ListWithFilter");
+        print(this, "QUESTION 3", "ListWithFilter");
 
         File[] fileArray = (new FileLister()).ListWithFilter("./src/main/java/MIAGE_M1/filesystem");
         List<String> list = new ArrayList<>();
@@ -55,6 +55,7 @@ public class FileListerTest {
 
         fileArray = (new FileLister()).ListWithFilter("./target/classes/MIAGE_M1/view");
         Arrays.stream(fileArray).forEach(l->list.add(l.getPath()));
+
         print(list);
 
         for(String s : list) {
@@ -64,7 +65,7 @@ public class FileListerTest {
     }
     @Test
     public void InnerListWithFilter() {
-        print("QUESTION 3", "InnerListWithFilter");
+        print(this, "QUESTION 3", "InnerListWithFilter");
 
         File[] fileArray = (new FileLister()).new InnerFileLister().ListWithFilter("./src/main/java/MIAGE_M1/filesystem");
         List<String> list = new ArrayList<>();
@@ -82,8 +83,7 @@ public class FileListerTest {
 
     @Test
     public void ListWithAnonymousInnerFilter() {
-        print("QUESTION 3", "ListWithAnonymousInnerFilter");
-        //Todo faire une interface et un test générique
+        print(this , "QUESTION 3", "ListWithAnonymousInnerFilter");
         File[] fileArray = (new FileLister()).ListWithAnonymousInnerFilter("./src/main/java/MIAGE_M1/filesystem");
         List<String> list = new ArrayList<>();
         Arrays.stream(fileArray).forEach(l->list.add(l.getPath()));
