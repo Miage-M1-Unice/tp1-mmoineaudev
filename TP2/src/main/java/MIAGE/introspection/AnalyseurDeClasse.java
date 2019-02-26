@@ -10,6 +10,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.lang.reflect.*;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -121,27 +122,21 @@ public class AnalyseurDeClasse {
         // Attention, si les champs sont des références sur d'autres objets on descendra en profondeur pour
         // afficher "récursivement" leur valeur également.
 
-        String indent = "\n";
-        if( lvl == 0 ) lvl =1 ;
-        for(int i = 0 ; i<lvl ; i++){
-            indent+="\t";
-        }
+        String indent = getIndent(lvl);
         String res = o.getClass().getName()+" {";
         Class oClass = Class.forName(o.getClass().getName());
-        Field[] fields = oClass.getFields();
-
+        Set<Field> fields = new HashSet<Field>(Arrays.asList(oClass.getFields()));
         for (Field f : fields){
-            Field[] subfields = f.getType().getFields();
-            if(isWrapperType(o.getClass())){
-                res+=indent + f.getType().getName() + " "+ f.getName()+" = "+f.get(o)+ ";";
+            f.setAccessible(true);
+            Object value = f.get(o);
+            if(isWrapperType(value.getClass())){
+                res+=indent + f.getType().getName() + " "+ f.getName()+" = " +value+ ";";
             }
-            /*if(subfields.length==0 && !f.getType().isArray()){
-                    res+=indent + f.getType().getName() + " "+ f.getName()+" = "+f.get(o)+ ";";
-            }*/else if(f.getType().isArray()){
-                res+= printArray(lvl,f.get(o), f);
+            else if(f.getType().isArray()){
+                res+= indent+ printArray(lvl+1,f.get(o), f);
 
-            }else  if(subfields.length>0){
-                res+=indent + genericToString(lvl + 1,f.get(o))+ " " +f.getName()+ ";";
+            }else {
+                res+=indent + genericToString(lvl + 1,f.get(o))+ "" +f.getName()+ ";";
             }
 
         }
@@ -150,18 +145,25 @@ public class AnalyseurDeClasse {
         return res+indent.substring(0, indent.lastIndexOf("\t"))+"}";
     }
 
+    private static String getIndent(int lvl) {
+        String res = "\n";
+        if( lvl == 0 ) lvl =1 ;
+        for(int i = 0 ; i<lvl ; i++){
+            res+="\t";
+        }return res;
+    }
+
     private static String printArray(int lvl, Object f, Field field) throws IllegalAccessException, ClassNotFoundException {
         String res = "\n"+f.getClass().getTypeName()+" "+field.getName()+" = {";
         for(int i = 0; i<Array.getLength(f); i++){
 
             Object o = Array.get( f, i);
-            res+=genericToString(lvl+1, o);
+            res+= genericToString(lvl, o)+" "+( isWrapperType(o.getClass())? o :" ");
             if(i<Array.getLength(f)-1)res+=",\n";
-
-
         }
-        return res+"}";
+        return "\n"+ res+"\n"+"};";
     }
+
     //********************* source https://stackoverflow.com/questions/709961/determining-if-an-object-is-of-primitive-type
     private static final Set<Class<?>> WRAPPER_TYPES = getWrapperTypes();
     public static boolean isWrapperType(Class<?> clazz)
