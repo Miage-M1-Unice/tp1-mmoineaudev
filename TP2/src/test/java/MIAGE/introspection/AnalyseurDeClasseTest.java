@@ -26,7 +26,7 @@ public class AnalyseurDeClasseTest {
         String nomClasse = "java.util.Date";//litChaineAuClavier();
         System.out.println("genericToString with "+nomClasse);
         try {
-            System.out.println("ToString : \n"+instance.genericToString(0,new ClasseBidon()));
+            System.out.println("ToString : \n"+instance.genericToString(new ClasseBidon()));
         } catch (Exception e) {
             System.out.println("oupsie ! \n"+e.getMessage());
             fail();
@@ -35,7 +35,7 @@ public class AnalyseurDeClasseTest {
     @Test
     public void givenTest() {
         try {
-            System.out.println(instance.genericToString(0,new Point(12,24)));
+            System.out.println(instance.genericToString(new Point(12,24)));
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         } catch (IllegalAccessException e) {
@@ -44,7 +44,7 @@ public class AnalyseurDeClasseTest {
         Polygon pol = new Polygon(new int[]{10, 20, 30}, new int[]{20,30, 40}, 3);
         pol.getBounds();
         try {
-            System.out.println(instance.genericToString(0, pol));
+            System.out.println(instance.genericToString( pol));
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         } catch (IllegalAccessException e) {

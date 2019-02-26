@@ -117,12 +117,10 @@ public class AnalyseurDeClasse {
     }
 
     //Une méthode toString() générique
-    public static String genericToString(int lvl,Object o) throws ClassNotFoundException, IllegalAccessException {
+    public static String genericToString(Object o) throws ClassNotFoundException, IllegalAccessException {
         //toString qui prend en paramètre un objet de type Object et affiche la valeur de chacun de ses champs.
         // Attention, si les champs sont des références sur d'autres objets on descendra en profondeur pour
         // afficher "récursivement" leur valeur également.
-
-        String indent = getIndent(lvl);
         String res = o.getClass().getName()+" {";
         Class oClass = Class.forName(o.getClass().getName());
         Set<Field> fields = new HashSet<Field>(Arrays.asList(oClass.getFields()));
@@ -130,38 +128,29 @@ public class AnalyseurDeClasse {
             f.setAccessible(true);
             Object value = f.get(o);
             if(isWrapperType(value.getClass())){
-                res+=indent + f.getType().getName() + " "+ f.getName()+" = " +value+ ";";
+                res+= f.getType().getName() + " "+ f.getName()+" = " +value+ ";\n";
             }
             else if(f.getType().isArray()){
-                res+= indent+ printArray(lvl+1,f.get(o), f);
+                res+=  printArray(f.get(o), f);
 
             }else {
-                res+=indent + genericToString(lvl + 1,f.get(o))+ "" +f.getName()+ ";";
+                res+= genericToString(f.get(o))+ " = " +f.getName()+ ";\n";
             }
 
         }
-
-
-        return res+indent.substring(0, indent.lastIndexOf("\t"))+"}";
+        return res+"}";
     }
 
-    private static String getIndent(int lvl) {
-        String res = "\n";
-        if( lvl == 0 ) lvl =1 ;
-        for(int i = 0 ; i<lvl ; i++){
-            res+="\t";
-        }return res;
-    }
 
-    private static String printArray(int lvl, Object f, Field field) throws IllegalAccessException, ClassNotFoundException {
+    private static String printArray( Object f, Field field) throws IllegalAccessException, ClassNotFoundException {
         String res = "\n"+f.getClass().getTypeName()+" "+field.getName()+" = {";
         for(int i = 0; i<Array.getLength(f); i++){
 
             Object o = Array.get( f, i);
-            res+= genericToString(lvl, o)+" "+( isWrapperType(o.getClass())? o :" ");
+            res+= genericToString(o)+" "+( isWrapperType(o.getClass())? "= "+o :" ");
             if(i<Array.getLength(f)-1)res+=",\n";
         }
-        return "\n"+ res+"\n"+"};";
+        return res+"\n"+"};\n";
     }
 
     //********************* source https://stackoverflow.com/questions/709961/determining-if-an-object-is-of-primitive-type
