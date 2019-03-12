@@ -23,7 +23,7 @@ public class MyClassLoader extends SecureClassLoader {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        Class<?> res = super.defineClass(name, b, 0, b.length);
+        Class<?> res = super.defineClass(getName(name), b, 0, b.length);
         return res;
 
     }
@@ -42,6 +42,17 @@ public class MyClassLoader extends SecureClassLoader {
         i=0;
         resList.stream().map(b -> res[i++] = b.byteValue());
         MIAGE_M1.view.Console.debug(this,"res size : "+res.length);
+        return res;
+    }
+
+    private String getName(String name) {
+
+        String res = name.substring(name.indexOf("classes/"), name.length())
+                .replace("classes/", "")
+                .replace(".class", "")
+                .replace("/", ".");
+
+        MIAGE_M1.view.Console.debug(this, "getName :"+res);
         return res;
     }
 
