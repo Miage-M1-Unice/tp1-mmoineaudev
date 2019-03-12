@@ -8,15 +8,15 @@ import java.util.List;
 
 public class MyClassLoader extends SecureClassLoader {
 
-    private String path;
+    private ArrayList<String> paths;
 
-    public MyClassLoader(String s) {
-        this.path = s;
+    public MyClassLoader(List<String> s) {
+        this.paths = new ArrayList<String>(s);
     }
 
 
     @Override
-    protected Class<?> findClass(String name) throws ClassNotFoundException {
+    protected Class<?> findClass(String name) throws ClassNotFoundException{
         MIAGE_M1.view.Console.debug(this, "findClass :"+name);
         byte[] b = new byte[0];
         try {
@@ -33,24 +33,54 @@ public class MyClassLoader extends SecureClassLoader {
     private byte[] loadClassData(String name) throws ClassNotFoundException, IOException {
         MIAGE_M1.view.Console.debug(this, "loadClassData :"+name);
 
-        DataInputStream inputStream = new DataInputStream(new FileInputStream(name));
+        File f = this.findFileInPath(name);
 
-        List<Byte> resList = new ArrayList<Byte>();
-        while(inputStream.available()>0){
-            resList.add(inputStream.readByte());
-        }
-       // Files.readAllBytes()
-        byte[] res = new byte[resList.size()];
-        i=0;
-        resList.stream().map(b -> res[i++] = b.byteValue());
+        if(f==null) throw new FileNotFoundException(name);
+        byte[] res = Files.readAllBytes(f.toPath());
         MIAGE_M1.view.Console.debug(this,"res size : "+res.length);
         return res;
     }
 
+    /**
+     * @return null if no file found
+     */
+    private File findFileInPath(String name) {
+        for(String aPath : paths){
+            File f = new File(aPath);
+            if(f.isDirectory()){
+                File theReseachedFile = findInDir(f, name);
+                if(theReseachedFile!=null) {
+                    MIAGE_M1.view.Console.debug(this,"theReseachedFile = "+f.getName());
+                    return theReseachedFile;
+                }
+            }else{
+                if(f.getName()==name) return f;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * @return null if no file found
+     */
+    private File findInDir(File f, String name) {
+        MIAGE_M1.view.Console.debug(this, "findInDir :"+name + " in " + f.getName());
+        for(File aFile : f.listFiles()){
+            if(aFile.isDirectory()){
+                File anotherFile = findInDir(aFile, name);
+                if(anotherFile != null && anotherFile.getName()==name) return anotherFile;
+            }else{
+                MIAGE_M1.view.Console.print("found : "+aFile.getName());
+                if(aFile.getName()==name)
+                    return aFile;
+            }
+        }
+        return null;
+    }
+
     private String getName(String name) {
 
-        String res = name.substring(name.indexOf("classes/"), name.length())
-                .replace("classes/", "")
+        String res = name.replace("classes/", "")
                 .replace(".class", "")
                 .replace("/", ".");
 

@@ -18,32 +18,20 @@ public class exo2 {
 
     @Test
     public void myClassLoaderTest() throws IOException {
-
-        ArrayList<File> al = getPaths("/home/asus/Desktop/work/prog_avancee_huet/TP2/target/classes");
-        ArrayList<Class> classes = new ArrayList<>();
-        MyClassLoader myCL = null;
-
-        try {
-            for(File fileInList : al){
-                myCL = new MyClassLoader(fileInList.getPath());
-                classes.add(myCL.findClass(fileInList.getPath()));
-            }
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        }
+        MyClassLoader myCL = new MyClassLoader(getPaths());
         MIAGE_M1.view.Console.debug(this, "Classes trouvées : ");
-        for(Class c : classes){
-            MIAGE_M1.view.Console.debug(this, c.getSimpleName());
+        try {
+            Class<?> aClass = myCL.findClass("ClasseBidonBisBis.class");
+        } catch (ClassNotFoundException e) {
+            fail();
         }
+
     }
 
-    private ArrayList<File> getPaths(String aPath) {
-        ArrayList<File> al = new ArrayList();
-        File classDir = new File(aPath);
-        for(File f : classDir.listFiles()) {
-            if(f.isDirectory()) al.addAll(getPaths(f.getPath()));
-            else al.add(f);
-        }
+    private ArrayList<String> getPaths() {
+        ArrayList<String> al = new ArrayList();
+        al.add("/home/asus/Desktop/work/prog_avancee_huet/TP2/target/classes");
+        al.add("/home/asus/Desktop/work/prog_avancee_huet/TP1/target/classes");
         return al;
     }
 }
