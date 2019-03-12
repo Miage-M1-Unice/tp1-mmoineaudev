@@ -1,6 +1,7 @@
 package m1miage;
 
 import java.io.*;
+import java.nio.file.Files;
 import java.security.SecureClassLoader;
 import java.util.ArrayList;
 import java.util.List;
@@ -38,6 +39,7 @@ public class MyClassLoader extends SecureClassLoader {
         while(inputStream.available()>0){
             resList.add(inputStream.readByte());
         }
+       // Files.readAllBytes()
         byte[] res = new byte[resList.size()];
         i=0;
         resList.stream().map(b -> res[i++] = b.byteValue());
