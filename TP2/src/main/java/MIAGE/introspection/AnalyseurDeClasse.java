@@ -125,7 +125,7 @@ public class AnalyseurDeClasse {
         Class oClass = Class.forName(o.getClass().getName());
         Set<Field> fields = new HashSet<Field>(Arrays.asList(oClass.getFields()));
         //Set<Field> declared = new HashSet<Field>(Arrays.asList(oClass.getDeclaredFields()));
-        fields.addAll(declared);
+        //fields.addAll(declared);
         for (Field f : fields){
             f.setAccessible(true);
             Object value = f.get(o);
